@@ -1,0 +1,414 @@
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  height: 100vh;
+  justify-content: center;
+  overflow: hidden;
+  /* Force no scroll */
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1vmin;
+  /* Minimal padding that scales */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1vh;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.title {
+  font-size: 4vh;
+  margin: 0;
+  background: linear-gradient(to right, #646cff, #9089fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.target-display {
+  font-size: 2.5vh;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0.5vh 0;
+  font-weight: 500;
+}
+
+/* Card Grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  /* 5 Columns */
+  grid-template-rows: repeat(4, 1fr);
+  /* 4 Rows */
+  gap: 1.5vmin;
+  /* Flexible gap */
+  width: 95vw;
+  height: 85vh;
+  /* Occupy most of screen */
+  margin: 0 auto;
+}
+
+.card-container {
+  perspective: 1000px;
+  width: 100%;
+  height: 100%;
+  /* Removed min-width to allow full scaling to fit */
+  cursor: pointer;
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.2);
+  border-radius: 1vmin;
+}
+
+.card.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 1vmin;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #333;
+  box-sizing: border-box;
+  /* Fix size mismatch due to padding/border */
+}
+
+/* Front Face (Character) */
+.card-front {
+  transform: rotateY(0deg);
+  background-color: #f5f6f5;
+  border: 0.3vmin solid #444;
+  justify-content: flex-start;
+  padding-top: 4%;
+}
+
+.card-front img {
+  width: 85%;
+  height: 85%;
+  object-fit: cover;
+  object-position: 50% 70%;
+  border-radius: 0.5vmin;
+}
+
+.cycle-btn {
+  position: absolute;
+  bottom: 1vmin;
+  right: 1vmin;
+  padding: 0.5vmin 1.5vmin;
+  background-color: #00bcd4;
+  color: white;
+  border-radius: 99vmin;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8vmin;
+  font-weight: bold;
+  z-index: 10;
+  cursor: pointer;
+  box-shadow: 0 0.2vmin 0.5vmin rgba(0, 0, 0, 0.4);
+  gap: 0.8vmin;
+  white-space: nowrap;
+}
+
+.character-name {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 188, 212, 0.75);
+  /* Turquoise 75% */
+  color: white;
+  padding: 0.5vmin 2vmin;
+  /* Reduced padding since buttons are gone */
+  text-align: center;
+  font-weight: bold;
+  font-size: 2.5vmin;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 2;
+  cursor: pointer;
+}
+
+/* Back Face (Card Back) */
+.card-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), url('/images/card_back.png');
+  /* Overlay + Image */
+  background-size: cover;
+  background-position: center;
+  border: 0.3vmin solid #333;
+  padding: 1vmin;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Navigation Bar */
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 2vh;
+  margin-bottom: 0.5vh;
+  padding: 0 2vmin;
+  box-sizing: border-box;
+}
+
+.nav-group {
+  display: flex;
+  gap: 1vmin;
+}
+
+.nav-btn {
+  /* Inherit styles from .tab but can be specific if needed */
+  background-color: #333;
+  color: #aaa;
+}
+
+#btn-group,
+#btn-instructions {
+  background-color: #d1d1d1;
+  color: #000;
+  font-weight: 600;
+}
+
+#btn-oponente {
+  background-color: #ff0055;
+  /* Intense Pink/Red */
+  color: white;
+  font-weight: bold;
+}
+
+#btn-solve {
+  background: linear-gradient(to right, #646cff, #9089fc);
+  color: white;
+  font-weight: bold;
+  border: none;
+}
+
+/* Tabs Center Group */
+.tabs-container {
+  display: flex;
+  gap: 1vmin;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 0.5vmin 1.5vmin;
+  background-color: #333;
+  color: #aaa;
+  border-radius: 0.5vmin;
+  font-size: 2vmin;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.tab:hover {
+  background-color: #444;
+  color: #fff;
+}
+
+.tab.active {
+  background-color: #00bcd4;
+  color: white;
+  font-weight: bold;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
+}
+
+.character-name-back {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background: #000000;
+  /* Black */
+  color: #888;
+  /* Gray */
+  padding: 0.5vmin 2vmin;
+  /* Reduced padding since buttons are gone */
+  text-align: center;
+  font-weight: bold;
+  font-size: 2.5vmin;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.feedback-text {
+  color: white;
+  font-size: 2vmin;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-top: 3vmin;
+  /* Push down to not overlap with title */
+}
+
+
+.card.stacked {
+  box-shadow:
+    0 0.5vmin 1vmin rgba(0, 0, 0, 0.2),
+    0.4vmin 0.4vmin 0 #555,
+    0.8vmin 0.8vmin 0 #666;
+}
+
+/* Side Shuffle Animation */
+@keyframes side-shuffle {
+  0% {
+    transform: translate3d(0, 0, -50px) scale(0.85);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: translate3d(85%, 5%, -50px) rotate(5deg) scale(0.9);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate3d(85%, 5%, 50px) rotate(5deg) scale(1.05);
+    z-index: 50;
+    /* Helper if browser respects it */
+  }
+
+  100% {
+    transform: translate3d(0, 0, 1px) rotate(0deg) scale(1);
+    z-index: 50;
+  }
+}
+
+.stack-enter {
+  animation: side-shuffle 0.7s ease-in-out forwards;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+
+/* Overlays */
+#group-overlay,
+#start-overlay,
+#image-overlay,
+#instructions-overlay,
+#question-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.95);
+  display: flex;
+  /* Force flex unless hidden */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  color: #00bcd4;
+  text-align: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.overlay-title {
+  font-size: 4rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+#start-overlay .overlay-title {
+  color: #ff0055;
+  font-size: 3rem;
+  /* Slightly smaller to fit longer text if needed, or keep 4rem. User didn't asksize change but text is longer. */
+}
+
+.overlay-names {
+  font-size: 2rem;
+  line-height: 1.6;
+  font-weight: 500;
+  color: #333;
+}
+
+@media (max-width: 800px) and (orientation: portrait) {
+  /* Optional: fallback for portrait if needed, but keeping forced 5x4 for now */
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  .card-face {
+    background-color: #f0f0f0;
+  }
+
+  .card-front {
+    border-color: #ddd;
+  }
+}
+/* Eliminated Mark (X) */
+.eliminated-mark {
+  position: absolute;
+  top: 0.5vmin;
+  left: 0.5vmin;
+  font-size: 3vmin;
+  color: #ff0055;
+  font-weight: bold;
+  line-height: 1;
+  z-index: 10;
+  text-shadow: 0 0 2px white;
+  pointer-events: none;
+}
