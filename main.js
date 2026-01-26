@@ -76,7 +76,7 @@ window.closeOverlay = (id) => {
 
         if (startOverlay && targetNameDisplay && targetChar) {
           targetNameDisplay.textContent = targetChar.name;
-          if (targetImageDisplay) targetImageDisplay.src = targetChar.infoImage || '';
+          if (targetImageDisplay) targetImageDisplay.src = resolvePath(targetChar.infoImage) || '';
 
           startOverlay.classList.remove('hidden');
           startOverlay.style.display = '';
@@ -386,7 +386,7 @@ function renderGameUI() {
 
       if (targetNameDisplay && targetChar) {
         targetNameDisplay.textContent = targetChar.name;
-        if (targetImageDisplay) targetImageDisplay.src = targetChar.infoImage || '';
+        if (targetImageDisplay) targetImageDisplay.src = resolvePath(targetChar.infoImage) || '';
       }
       overlay.classList.remove('hidden');
       overlay.style.display = '';
