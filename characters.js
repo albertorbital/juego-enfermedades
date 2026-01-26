@@ -123,20 +123,9 @@ export const characters = [
             sistema_afectado: { text: ["🤢 Digestivo: diarrea, fiebre, dolor abdominal; característico: inicio brusco tras ingestión de alimentos contaminados"], image: "/images/organo/digestivo.png", images: ["/images/organo/digestivo.png"] }
         }
     },
+
     {
         id: 11,
-        name: "Tétanos",
-        infoImage: "/images/enfermedades/Tetanos.png",
-        categories: {
-            agente: { text: ["Clostridium tetani"], image: "/images/agente/bacteria.png", images: ["/images/agente/bacteria.png"] },
-            transmision: { text: ["✋ Contacto de polvo, heces o suciedad a través de heridas abiertas"], image: "/images/transmision/fluidos.png", images: ["/images/transmision/fluidos.png"] },
-            prevencion_ciudadana: { text: ["💉 Vacunación", "😷 Protección personal: Cura de heridas"], image: "/images/prevencion/vacuna.png", images: ["/images/prevencion/vacuna.png"] },
-            prevencion_hospitalaria: { text: ["Precauciones estándar"], image: "/images/epi/noprecisa.png", images: ["/images/epi/noprecisa.png"] },
-            sistema_afectado: { text: ["🧠 Neurológico: espasmos musculares, rigidez; característico: no poder abrir la boca"], image: "/images/organo/neurologico.png", images: ["/images/organo/neurologico.png"] }
-        }
-    },
-    {
-        id: 12,
         name: "Botulismo",
         infoImage: "/images/enfermedades/Botulismo.png",
         categories: {
@@ -150,7 +139,7 @@ export const characters = [
 
     // 1.3 Parásitos
     {
-        id: 13,
+        id: 12,
         name: "Malaria",
         infoImage: "/images/enfermedades/Malaria.png",
         categories: {
@@ -162,7 +151,7 @@ export const characters = [
         }
     },
     {
-        id: 14,
+        id: 13,
         name: "Toxoplasmosis",
         infoImage: "/images/enfermedades/toxoplasmosis.png",
         categories: {
@@ -174,7 +163,7 @@ export const characters = [
         }
     },
     {
-        id: 15,
+        id: 14,
         name: "Leishmaniosis",
         infoImage: "/images/enfermedades/leishmaniosis.png",
         categories: {
@@ -186,7 +175,7 @@ export const characters = [
         }
     },
     {
-        id: 16,
+        id: 15,
         name: "Anisakis",
         infoImage: "/images/enfermedades/Anisakis.png",
         categories: {
@@ -198,7 +187,7 @@ export const characters = [
         }
     },
     {
-        id: 17,
+        id: 16,
         name: "Sarna",
         infoImage: "/images/enfermedades/Sarna.png",
         categories: {
@@ -210,7 +199,7 @@ export const characters = [
         }
     },
     {
-        id: 18,
+        id: 17,
         name: "Pediculosis",
         infoImage: "/images/enfermedades/Pediculosis.png",
         categories: {
@@ -224,7 +213,7 @@ export const characters = [
 
     // 1.4 Hongo
     {
-        id: 19,
+        id: 18,
         name: "Candidiasis",
         infoImage: "/images/enfermedades/Candidiasis.png",
         categories: {
@@ -236,7 +225,7 @@ export const characters = [
         }
     },
     {
-        id: 20,
+        id: 19,
         name: "Tiña",
         infoImage: "/images/enfermedades/tina.png",
         categories: {
@@ -248,7 +237,7 @@ export const characters = [
         }
     },
     {
-        id: 21,
+        id: 20,
         name: "Onicomicosis",
         infoImage: "/images/enfermedades/onicomicosis.png",
         categories: {
