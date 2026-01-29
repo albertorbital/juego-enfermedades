@@ -6,22 +6,26 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Guess Who?</title>
-  <script type="module" crossorigin src="/juego-enfermedades/assets/index-Bn-Gr03i.js"></script>
-  <link rel="stylesheet" crossorigin href="/juego-enfermedades/assets/index-FGjUqTAb.css">
+  <script type="module" crossorigin src="/juego-enfermedades/assets/index-ehC9eDd6.js"></script>
+  <link rel="stylesheet" crossorigin href="/juego-enfermedades/assets/index-DmF9TC1z.css">
 </head>
 
 <body>
   <!-- Overlays -->
-  <div id="mode-selection-overlay"
-    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #00bcd4; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20000; color: white; text-align: center;">
-    <div style="font-size: 4rem; font-weight: bold; margin-bottom: 1rem;">¿Qué enfermedad eres?</div>
-    <div style="font-size: 2rem; margin-bottom: 3rem;">Selecciona el modo de juego</div>
-    <div style="display: flex; gap: 2rem;">
-      <button id="btn-mode-1vs1"
-        style="padding: 1rem 2rem; font-size: 1.5rem; border: none; border-radius: 0.5rem; background: white; color: #00bcd4; font-weight: bold; cursor: pointer; transition: transform 0.2s;">1vs1</button>
-      <button id="btn-mode-teacher"
-        style="padding: 1rem 2rem; font-size: 1.5rem; border: none; border-radius: 0.5rem; background: white; color: #00bcd4; font-weight: bold; cursor: pointer; transition: transform 0.2s;">Aula
-        vs Profe</button>
+  <!-- Overlays -->
+  <div id="mode-selection-overlay">
+    <img id="uib-logo" src="images/uib.png" alt="UIB Logo" />
+    <div class="overlay-title">¿Qué enfermedad <br class="mobile-break">eres?</div>
+
+    <!-- Animation Container -->
+    <div id="home-anim-container">
+      <img id="home-anim-img" src="" alt="Intro Animation" />
+    </div>
+
+    <div class="mode-selection-subtitle">Selecciona el modo de juego</div>
+    <div class="mode-buttons">
+      <button id="btn-mode-1vs1" class="mode-btn">1vs1</button>
+      <button id="btn-mode-teacher" class="mode-btn">Aula vs Profe</button>
     </div>
   </div>
 
@@ -52,10 +56,14 @@
   </div>
 
   <div id="image-overlay" class="hidden" onclick="closeOverlay('image-overlay')">
+    <button id="btn-prev-image" class="nav-arrow left" onclick="prevImage(event)">&#10094;</button>
+
     <div class="overlay-title" id="overlay-active-title"></div>
     <img id="overlay-active-image" src="" alt="Detalle"
       style="max-height: 50vh; max-width: 90vw; margin-top: 2rem; border-radius: 1rem; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
     <div style="margin-top: 1rem; color: #666;">(Haz clic para cerrar)</div>
+
+    <button id="btn-next-image" class="nav-arrow right" onclick="nextImage(event)">&#10095;</button>
   </div>
 
   <div id="question-overlay" class="hidden" onclick="closeOverlay('question-overlay')">
