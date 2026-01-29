@@ -914,6 +914,57 @@ body {
   text-align: center;
 }
 
+.overlay-dark-bg {
+  background-color: rgba(30, 30, 30, 0.95) !important;
+  color: #fff !important;
+}
+
+/* Instructions Carousel */
+.inst-carousel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90vw;
+  max-width: 600px;
+}
+
+.inst-slide-img {
+  width: 100%;
+  max-height: 50vh;
+  object-fit: contain;
+  border-radius: 1vmin;
+  margin-bottom: 2rem;
+  box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.3);
+}
+
+.inst-text {
+  font-size: 1.8rem;
+  color: #333;
+  /* Dark text for light overlay, will override if needed */
+  margin-bottom: 2rem;
+  min-height: 4rem;
+  /* Valid height for text lines */
+}
+
+.inst-dots {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.inst-dot {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background-color: #ddd;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.inst-dot.active {
+  background-color: #00bcd4;
+}
+
 .hidden {
   display: none !important;
 }

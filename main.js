@@ -19,7 +19,60 @@ let gameMode = '1vs1'; // Default mode
 const flippedStates = new Set(); // Global state for all categories
 let cardSubIndices = {}; // Track sub-index for multi-item cards
 let lastCycledId = null; // Track last cycled card for animation
+
 let activeTriggerQuestion = null; // Track last clicked question for animations
+
+// Instructions Carousel State
+let currentInstSlide = 0;
+const instSlides = [
+  { img: 'images/tutorial/tut_1.gif', text: "1. En ¿Qué enfermedad eres? Haz cualquier pregunta de Sí o No de las cartas de enfermedad." },
+  { img: 'images/tutorial/tut_2.gif', text: "2. Para ir Descartando las enfermedades que NO seas, Haz click en la carta! Aparecerán las Enfermedades que comparten alguna Carta/Característica con ella." },
+  { img: 'images/tutorial/tut_3.gif', text: "3. ¡Cuidado! Algunas Enfermedades tienen varias cartas y preguntas, ten cuidado de no Girarlas y Descartarlas antes de tiempo!" },
+  { img: 'images/tutorial/tut_4.gif', text: "4. Revisa cada Enfermedad en Enfermedades." },
+  { img: 'images/tutorial/tut_5.gif', text: "5. Completa tu investigación para averiguar…¡Qué enfermedad eres!" }
+];
+
+function updateInstCarousel() {
+  const contentEl = document.getElementById('inst-slide-content');
+  const dotsEl = document.getElementById('inst-dots-container');
+  if (!contentEl || !dotsEl) return;
+
+  const slide = instSlides[currentInstSlide];
+  contentEl.innerHTML = `
+    <img src="${resolvePath(slide.img)}" class="inst-slide-img" alt="Tutorial Step ${currentInstSlide + 1}">
+    <div class="inst-text">${slide.text}</div>
+  `;
+
+  dotsEl.innerHTML = instSlides.map((_, idx) => `
+    <div class="inst-dot ${idx === currentInstSlide ? 'active' : ''}" 
+         onclick="window.goToInstSlide(${idx}); event.stopPropagation()"></div>
+  `).join('');
+
+  // Show close hint only on last slide
+  const closeHint = document.getElementById('inst-close-hint');
+  if (closeHint) {
+    if (currentInstSlide === instSlides.length - 1) {
+      closeHint.classList.remove('hidden');
+      closeHint.style.display = 'block';
+      closeHint.style.visibility = 'visible';
+    } else {
+      closeHint.classList.add('hidden');
+      closeHint.style.display = 'none';
+    }
+  }
+}
+
+window.goToInstSlide = (idx) => {
+  currentInstSlide = idx;
+  updateInstCarousel();
+};
+
+window.nextInstSlide = () => {
+  if (currentInstSlide < instSlides.length - 1) {
+    currentInstSlide++;
+    updateInstCarousel();
+  }
+};
 
 // Carousel State
 let carouselItems = [];
@@ -720,7 +773,8 @@ function renderGameUI() {
       </div>
       
       <!-- Ending Overlay -->
-      <div id="endgame-overlay" class="hidden">
+      <!-- Ending Overlay -->
+      <div id="endgame-overlay" class="hidden overlay-dark-bg">
          <h1 class="overlay-title">¿Has adivinado qué enfermedad eres?</h1>
          <div class="overlay-actions">
            <button class="action-btn yes-btn" id="btn-end-yes">¡SÍ!</button>
@@ -827,7 +881,9 @@ function renderGameUI() {
 
   // End Game Buttons
   document.getElementById('btn-end-yes')?.addEventListener('click', () => {
+    document.getElementById('start-overlay').classList.add('hidden');
     document.getElementById('endgame-overlay').classList.add('hidden');
+    document.getElementById('endgame-overlay').style.display = 'none';
     document.getElementById('celebration-overlay').classList.remove('hidden');
     document.getElementById('celebration-overlay').style.display = 'flex';
     startConfetti();
@@ -912,6 +968,7 @@ async function initGame() {
       window.isGameSetup = true;
       const instructionsOverlay = document.getElementById('instructions-overlay');
       if (instructionsOverlay) {
+        updateInstCarousel(); // Initialize carousel content
         instructionsOverlay.classList.remove('hidden');
         instructionsOverlay.style.display = 'flex';
       }
