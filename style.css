@@ -13,6 +13,34 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@keyframes rainbow-cycle {
+  0% {
+    background-color: #00bcd4;
+  }
+
+  /* Turquoise */
+  25% {
+    background-color: #2196F3;
+  }
+
+  /* Blue */
+  50% {
+    background-color: #9C27B0;
+  }
+
+  /* Lilac */
+  75% {
+    background-color: #FF5722;
+  }
+
+  /* Red Orange */
+  100% {
+    background-color: #00bcd4;
+  }
+
+  /* Loop */
+}
+
 body {
   margin: 0;
   display: flex;
@@ -21,7 +49,68 @@ body {
   height: 100vh;
   justify-content: center;
   overflow: hidden;
-  /* Force no scroll */
+  background-color: #e0e0e0;
+  /* Slightly darker gray */
+}
+
+/* ... */
+
+.card-front {
+  transform: rotateY(0deg);
+  background-color: #f5f6f5;
+  border: none;
+  /* Stroke removed */
+  /* Flex settings for fallback, but we use absolute mostly now */
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ... */
+
+/* Overlays - Apply Rainbow BG here for "Screen Initial" feel */
+/* Overlays - Initial & Gameplay Interaction (Rainbow) */
+#endgame-overlay,
+#celebration-overlay,
+#mobile-category-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.95);
+  animation: rainbow-cycle 20s infinite linear;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Informational & Setup Overlays (Soft Gray like the initial background) */
+#mode-selection-overlay,
+#group-overlay,
+#instructions-overlay,
+#start-overlay,
+#image-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #e0e0e0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  text-align: center;
 }
 
 #app {
@@ -78,22 +167,81 @@ body {
   margin: 0 auto;
 }
 
-.card-container {
-  perspective: 1000px;
-  width: 100%;
-  height: 100%;
-  /* Removed min-width to allow full scaling to fit */
-  cursor: pointer;
-}
 
 .card {
   width: 100%;
   height: 100%;
   position: relative;
-  transition: transform 0.6s;
   transform-style: preserve-3d;
+  transition: transform 0.6s;
   box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.2);
   border-radius: 1vmin;
+  z-index: 30;
+  /* Ensure card is above animation naturally */
+}
+
+.card-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  width: 100%;
+  height: 100%;
+  /* Removed min-width to allow full scaling to fit */
+  cursor: pointer;
+  position: relative;
+  /* Added for background animation positioning */
+  z-index: 1;
+  /* Lowest default */
+}
+
+.card-container.is-candidate {
+  z-index: 2;
+  /* Higher than non-candidates */
+}
+
+.card-container.is-candidate .card {
+  z-index: 30;
+  /* Higher than animation */
+}
+
+@keyframes aura-fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10%) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* Character Background Animation */
+.card-bg-anim {
+  position: absolute;
+  top: -85%;
+  /* Adjusted for a better balance */
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 150%;
+  height: 150%;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  animation: aura-fade-in 0.6s ease-out forwards;
+  transition: opacity 0.5s ease-out;
+}
+
+.card-bg-anim img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+  /* Add soft glow */
+}
+
+.card-bg-anim.fade-out {
+  opacity: 0 !important;
+  animation: none !important;
 }
 
 .card.is-flipped {
@@ -117,20 +265,25 @@ body {
 }
 
 /* Front Face (Character) */
-.card-front {
-  transform: rotateY(0deg);
-  background-color: #f5f6f5;
-  border: 0.3vmin solid #444;
-  justify-content: flex-start;
-  padding-top: 4%;
-}
+/* Front Face (Character) */
+/* Old rule removed */
 
 .card-front img {
-  width: 85%;
-  height: 85%;
-  object-fit: cover;
-  object-position: 50% 70%;
-  border-radius: 0.5vmin;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Centered exactly */
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  opacity: 0.4;
+  z-index: 1;
+  /* Below text */
+  pointer-events: none;
+  filter: grayscale(0.2);
+  margin-top: 5%;
+  /* Slight offset down to clear title potentially */
 }
 
 .cycle-btn {
@@ -154,24 +307,239 @@ body {
   white-space: nowrap;
 }
 
+/* Full Opacity Overlays (Initial, Menu, EndGame, Celebration, Group) */
+#mode-selection-overlay,
+#group-overlay,
+#endgame-overlay,
+#celebration-overlay,
+#mobile-category-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #e0e0e0;
+  /* Solid gray */
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  text-align: center;
+}
+
+/* Informational Overlays - Resetting from previous translucent styles */
+#instructions-overlay,
+#start-overlay,
+#image-overlay {
+  background-color: #e0e0e0;
+  backdrop-filter: none;
+}
+
+
+
+/* Home Animation */
+#home-anim-container {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 40vh;
+  /* Limit height so buttons fit */
+  width: 100%;
+  margin: 2vmin 0;
+}
+
+#home-anim-img {
+  height: 100%;
+  width: auto;
+  max-width: 80%;
+  object-fit: contain;
+}
+
+.mode-selection-subtitle {
+  font-size: 2.5vmin;
+  margin-bottom: 2vmin;
+  opacity: 0.9;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 2vmin;
+  margin-bottom: 5vmin;
+}
+
+.mode-btn {
+  padding: 1.5vmin 3vmin;
+  font-size: 2vmin;
+  border: none;
+  border-radius: 1vmin;
+  background: white;
+  color: #00bcd4;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.2);
+}
+
+.mode-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 1vmin 2vmin rgba(0, 0, 0, 0.3);
+}
+
+/* Character Name (Title) */
 .character-name {
   position: absolute;
   top: 0;
+  left: 0;
   width: 100%;
   box-sizing: border-box;
-  background: rgba(0, 188, 212, 0.75);
-  /* Turquoise 75% */
+  background: var(--theme-color, rgba(0, 188, 212, 0.75));
   color: white;
-  padding: 0.5vmin 2vmin;
-  /* Reduced padding since buttons are gone */
+  padding: 0.2vmin 0.5vmin;
+  /* Reduced padding */
   text-align: center;
   font-weight: bold;
-  font-size: 2.5vmin;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  z-index: 2;
+  font-size: 2.2vmin;
+  /* Existing Base Size */
+
+  /* Wrapping logic */
+  white-space: normal;
+  /* Allow wrapping */
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 4vmin;
+  /* Ensure space for 2 lines */
+
+  z-index: 10;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.character-name:hover {
+  filter: brightness(1.15);
+  text-decoration: underline;
+  box-shadow: 0 0.5vmin 0.5vmin rgba(0, 0, 0, 0.3);
+}
+
+/* Category Text (Question) */
+.card-category-text {
+  position: absolute;
+  top: 3vmin;
+  /* Below title */
+  bottom: 3vmin;
+  /* Above button area roughly */
+  left: 1vmin;
+  right: 1vmin;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-color, #0066cc);
+  font-weight: bold;
+  line-height: 1.3;
+  z-index: 5;
+  /* Above image */
+  pointer-events: none;
+  white-space: normal;
+  /* Allow wrapping */
+  word-wrap: break-word;
+  /* text-shadow removed */
+}
+
+/* Stack Visuals inside Button */
+.stack-visual {
+  display: inline-block;
+  width: 1.2vmin;
+  height: 1.6vmin;
+  background-color: white;
+  border: 0.1vmin solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.1vmin;
+  margin-right: 0.8vmin;
+  position: relative;
+  vertical-align: middle;
+}
+
+.stack-visual.stack-2 {
+  box-shadow: 0.3vmin -0.3vmin 0 white, 0.3vmin -0.3vmin 0 0.1vmin rgba(0, 0, 0, 0.1);
+}
+
+.stack-visual.stack-3 {
+  box-shadow:
+    0.3vmin -0.3vmin 0 white, 0.3vmin -0.3vmin 0 0.1vmin rgba(0, 0, 0, 0.1),
+    0.6vmin -0.6vmin 0 white, 0.6vmin -0.6vmin 0 0.1vmin rgba(0, 0, 0, 0.1);
+  margin-top: 0.6vmin;
+  /* Push down slightly to accommodate shadow going up */
+  margin-right: 1.2vmin;
+}
+
+/* Card Themes */
+/* Virus: Red Orange */
+.card[data-type="virus"] {
+  --theme-color: #FF5722;
+  /* Red Orange */
+  --text-color: #E64A19;
+  --card-bg: #FFCCBC;
+  /* Light Red Orange */
+}
+
+.card[data-type="virus"] .card-front img {
+  filter: sepia(100%) saturate(300%) hue-rotate(-50deg);
+}
+
+.card[data-type="virus"] .card-front {
+  background-color: var(--card-bg);
+}
+
+/* Bacteria: Blue */
+.card[data-type="bacteria"] {
+  --theme-color: #2196F3;
+  /* Blue */
+  --text-color: #0277BD;
+  --card-bg: #BBDEFB;
+  /* Light Blue */
+}
+
+.card[data-type="bacteria"] .card-front img {
+  filter: sepia(100%) saturate(300%) hue-rotate(180deg);
+}
+
+.card[data-type="bacteria"] .card-front {
+  background-color: var(--card-bg);
+}
+
+/* Fungus: Green */
+.card[data-type="fungus"] {
+  --theme-color: #2E7D32;
+  /* Dark Green */
+  --text-color: #1B5E20;
+  --card-bg: #B2DFDB;
+  /* Soft Turquoise Green */
+}
+
+/* Icons stay as is for fungus */
+.card[data-type="fungus"] .card-front {
+  background-color: var(--card-bg);
+}
+
+/* Parasite: Lilac */
+.card[data-type="parasite"] {
+  --theme-color: #9C27B0;
+  /* Medium Lilac */
+  --text-color: #7B1FA2;
+  --card-bg: #E1BEE7;
+  /* Light Lilac */
+}
+
+.card[data-type="parasite"] .card-front img {
+  filter: sepia(100%) saturate(300%) hue-rotate(220deg);
+}
+
+.card[data-type="parasite"] .card-front {
+  background-color: var(--card-bg);
 }
 
 /* Back Face (Card Back) */
@@ -193,8 +561,7 @@ body {
 /* Navigation Bar */
 .nav-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   width: 100%;
   margin-top: 2vh;
   margin-bottom: 0.5vh;
@@ -202,69 +569,258 @@ body {
   box-sizing: border-box;
 }
 
+/* Landscape Navigation */
+.nav-landscape {
+  display: flex;
+  justify-content: space-between;
+  width: 100% !important;
+}
+
+.nav-portrait {
+  display: none;
+}
+
 .nav-group {
   display: flex;
   gap: 1vmin;
 }
 
+.nav-group.left {
+  justify-content: flex-start;
+}
+
+.nav-group.right {
+  justify-content: flex-end;
+}
+
+/* Landscape Nav Buttons */
 .nav-btn {
-  /* Inherit styles from .tab but can be specific if needed */
-  background-color: #333;
-  color: #aaa;
-}
-
-#btn-group,
-#btn-instructions {
-  background-color: #d1d1d1;
-  color: #000;
-  font-weight: 600;
-}
-
-#btn-oponente {
-  background-color: #ff0055;
-  /* Intense Pink/Red */
-  color: white;
+  padding: 0.8vmin 2vmin;
+  border-radius: 0.5vmin;
+  font-size: 2vmin;
   font-weight: bold;
-}
-
-#btn-solve {
-  background: linear-gradient(to right, #646cff, #9089fc);
-  color: white;
-  font-weight: bold;
+  cursor: pointer;
   border: none;
+  box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Tabs Center Group */
-.tabs-container {
+.nav-btn:hover {
+  transform: translateY(-0.2vmin);
+}
+
+.nav-btn-light {
+  background-color: white;
+  color: #333;
+}
+
+.nav-btn-red {
+  background-color: #ff0055;
+  color: white;
+}
+
+/* Hidden in new layout but referenced in JS just in case */
+#btn-solve {
+  display: none;
+}
+
+/* Landscape Tabs (Original) */
+.tabs-container.landscape-only {
   display: flex;
   gap: 1vmin;
   justify-content: center;
   flex-wrap: wrap;
+  margin-top: 0.5vh;
 }
 
 .tab {
-  padding: 0.5vmin 1.5vmin;
-  background-color: #333;
-  color: #aaa;
-  border-radius: 0.5vmin;
+  padding: 1vmin 2vmin;
+  background-color: white;
+  color: #333;
+  border-radius: 1vmin;
   font-size: 2vmin;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   user-select: none;
+  border: none;
+  box-shadow: 0 0.2vmin 0.5vmin rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tab:hover {
-  background-color: #444;
-  color: #fff;
+  background-color: #f0f0f0;
+  transform: translateY(-0.1vmin);
 }
 
 .tab.active {
-  background-color: #00bcd4;
-  color: white;
+  animation: rainbow-cycle 20s infinite linear !important;
+  color: white !important;
   font-weight: bold;
   transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
+  box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+/* Media Query for Portrait Navigation */
+@media (orientation: portrait) {
+  .nav-landscape {
+    display: none !important;
+  }
+
+  .landscape-only {
+    display: none !important;
+  }
+
+  .nav-bar {
+    margin-top: 1vh;
+    position: relative;
+    min-height: 8vmin;
+    justify-content: center;
+  }
+
+  .nav-portrait {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  /* Hamburger Button - Absolute Top Left */
+  .icon-btn-menu {
+    position: absolute;
+    top: 0;
+    left: 2vmin;
+    width: 10vmin;
+    height: 10vmin;
+    background: white;
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    padding: 2vmin;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+  }
+
+  .portrait-categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 1vmin;
+    width: 100%;
+    padding-left: 14vmin;
+    box-sizing: border-box;
+  }
+
+  /* Category Text Buttons (Pills) */
+  .cat-text-btn {
+    background-color: white;
+    color: #333;
+    border: none;
+    border-radius: 2vmin;
+    padding: 1.2vmin 2.5vmin;
+    font-size: 2.2vmin;
+    font-weight: 500;
+    box-shadow: 0 0.3vmin 0.6vmin rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .cat-text-btn.active {
+    animation: rainbow-cycle 20s infinite linear !important;
+    color: white !important;
+    font-weight: bold;
+    transform: scale(1.05);
+    box-shadow: 0 0.5vmin 1.2vmin rgba(0, 0, 0, 0.2);
+  }
+}
+
+
+/* Mobile Menu Panel */
+#mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 20000;
+  display: flex;
+  justify-content: flex-start;
+  backdrop-filter: blur(2px);
+}
+
+.mobile-menu-panel {
+  width: 70%;
+  height: 100%;
+  background-color: #e0e0e0;
+  padding: 2vmin;
+  box-shadow: 2vmin 0 5vmin rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 2vmin;
+  padding-top: 10vmin;
+}
+
+.nav-btn.full-width {
+  width: 100%;
+  padding: 3vmin;
+  font-size: 3vmin;
+  text-align: center;
+  justify-content: center;
+}
+
+.nav-btn.full-width.nav-btn-close {
+  background-color: #555;
+  color: white;
+  margin-top: auto;
+}
+
+
+
+.mobile-menu-item.active {
+  animation: rainbow-cycle 20s infinite linear;
+  background-color: #00bcd4;
+  color: white;
+}
+
+.overlay-title {
+  font-size: 5vmin;
+  margin-bottom: 5vmin;
+  /* Rainbow Text Effect */
+  background: linear-gradient(90deg, #00bcd4, #2196F3, #9C27B0, #FF5722, #00bcd4);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-text 10s ease infinite;
+}
+
+@keyframes gradient-text {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .character-name-back {
@@ -369,9 +925,8 @@ body {
 }
 
 #start-overlay .overlay-title {
-  color: #ff0055;
+  /* Inherits rainbow from .overlay-title */
   font-size: 3rem;
-  /* Slightly smaller to fit longer text if needed, or keep 4rem. User didn't asksize change but text is longer. */
 }
 
 .overlay-names {
@@ -399,16 +954,381 @@ body {
     border-color: #ddd;
   }
 }
-/* Eliminated Mark (X) */
-.eliminated-mark {
-  position: absolute;
-  top: 0.5vmin;
-  left: 0.5vmin;
+
+/* Mobile and Desktop Visibility Utilities */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: flex;
+}
+
+/* Icon Buttons */
+.icon-btn {
+  display: flex !important;
+  /* Force flex to center svg */
+  align-items: center;
+  justify-content: center;
+  padding: 0.5vmin;
+  /* Reduced padding */
+  width: 5vmin;
+  /* Fixed square-ish size */
+  height: 5vmin;
+  border-radius: 50%;
+  background-color: #333;
+  color: #fff;
+}
+
+.icon-btn:hover {
+  background-color: #555;
+  transform: scale(1.1);
+}
+
+#btn-oponente.icon-btn {
+  background-color: #ff0055;
+}
+
+#btn-group.icon-btn,
+#btn-instructions.icon-btn {
+  background-color: #444;
+}
+
+/* Center Nav Container */
+.center-nav {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* Mobile Category Menu (Overlay) */
+#mobile-category-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 20000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-content {
+  background: white;
+  padding: 3vmin;
+  border-radius: 2vmin;
+  width: 80%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vmin;
+}
+
+.mobile-menu-content h3 {
+  color: #333;
+  margin: 0 0 2vmin 0;
+  text-align: center;
   font-size: 3vmin;
-  color: #ff0055;
+}
+
+.mobile-menu-item {
+  padding: 2vmin;
+  background: #f0f0f0;
+  border-radius: 1vmin;
+  color: #333;
+  text-align: center;
   font-weight: bold;
-  line-height: 1;
+  font-size: 2.5vmin;
+  cursor: pointer;
+}
+
+.mobile-menu-item.active {
+  background: #00bcd4;
+  color: white;
+}
+
+.close-menu-btn {
+  margin-top: 2vmin;
+  padding: 2vmin;
+  background: #ff0055;
+  color: white;
+  text-align: center;
+  border-radius: 1vmin;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+
+/* Mobile Responsive overrides */
+@media (max-width: 800px) {
+  .mobile-only {
+    display: flex;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .nav-bar {
+    padding: 0 1vmin;
+  }
+
+  .icon-btn {
+    width: 8vmin;
+    height: 8vmin;
+    padding: 1.5vmin;
+  }
+
+  .title {
+    font-size: 3vh;
+    /* Smaller title on mobile */
+  }
+}
+
+/* Progress Bar */
+.progress-container {
+  display: flex;
+  align-items: center;
+  width: 90%;
+  position: relative;
+  margin: 1.5vmin 0;
+}
+
+.progress-wrapper {
+  flex-grow: 1;
+  height: 4vmin;
+  background-color: #ffffff;
+  border-radius: 99vmin;
+  overflow: hidden;
+  box-shadow: 0 0.2vmin 0.5vmin rgba(0, 0, 0, 0.1);
+  position: relative;
+  margin-right: 4vmin;
+  /* Room for overlapping goal icon */
+}
+
+/* Progress Goal Icon Anim */
+.progress-goal {
+  position: absolute;
+  right: -2vmin;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 10vmin;
+  /* Slightly taller than bar */
+  width: 10vmin;
   z-index: 10;
-  text-shadow: 0 0 2px white;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-goal img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  /* Animated Rainbow Gradient */
+  background: linear-gradient(90deg, #00bcd4, #2196F3, #9C27B0, #FF5722, #00bcd4);
+  background-size: 200% 100%;
+  animation: rainbow-slide 2s linear infinite;
+  transition: width 0.3s ease;
+}
+
+@keyframes rainbow-slide {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.progress-fill.blink-slow {
+  animation: blink-red 1s infinite;
+}
+
+.progress-fill.blink-fast {
+  animation: blink-red 0.4s infinite;
+}
+
+@keyframes blink-red {
+
+  0%,
+  100% {
+    background-color: #00bcd4;
+  }
+
+  50% {
+    background-color: #ff0055;
+    box-shadow: 0 0 10px #ff0055;
+  }
+}
+
+/* End Game Overlays */
+#endgame-overlay {
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+}
+
+.action-btn {
+  padding: 2vmin 4vmin;
+  font-size: 3vmin;
+  font-weight: bold;
+  border: none;
+  border-radius: 1vmin;
+  cursor: pointer;
+  margin: 1vmin;
+  transition: transform 0.2s;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.yes-btn {
+  background-color: #00e676;
+  /* Green */
+  color: #000;
+}
+
+.no-btn {
+  background-color: #ff1744;
+  /* Red */
+  color: #fff;
+}
+
+.restart-btn {
+  background: linear-gradient(45deg, #ff0055, #00bcd4);
+  color: white;
+  font-size: 4vmin;
+  padding: 3vmin 6vmin;
+  margin-top: 5vmin;
+  z-index: 100;
+}
+
+#confetti-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#celebration-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Portrait Adjustments for Start Screen */
+/* Portrait Adjustments for Start Screen */
+@media (orientation: portrait) {
+  #mode-selection-overlay .overlay-title {
+    margin-bottom: 1vmin;
+    /* Reduced margin */
+    font-size: 8vmin;
+    /* Even bigger title on portrait */
+    line-height: 1.1;
+  }
+
+  .mobile-break {
+    display: block;
+    /* Force break on mobile */
+  }
+
+  #home-anim-container {
+    margin: 1vmin 0;
+    max-height: 30vh;
+    /* Smaller to accommodate logo and big title */
+  }
+
+  .mode-selection-subtitle {
+    margin-bottom: 2vmin;
+  }
+
+  /* Double size for mode buttons */
+  .mode-btn {
+    padding: 4vmin 8vmin;
+    font-size: 5vmin;
+    border-radius: 2vmin;
+    box-shadow: 0 1vmin 2vmin rgba(0, 0, 0, 0.2);
+  }
+
+  #uib-logo {
+    max-width: 30%;
+    margin-bottom: 1vmin;
+    margin-top: 2vmin;
+  }
+}
+
+/* Default state for logo and break */
+#uib-logo {
+  max-height: 8vh;
+  margin-bottom: 1vmin;
+  object-fit: contain;
+}
+
+@media (orientation: landscape) {
+  .mobile-break {
+    display: none;
+  }
+
+  /* Optional: Hide logo on landscape if too cluttered, or keep small */
+  #uib-logo {
+    max-height: 10vh;
+  }
+}
+
+/* End of file */
+
+/* Carousel Arrows */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  font-size: 5vmin;
+  padding: 1vmin;
+  cursor: pointer;
+  border-radius: 50%;
+  color: #333;
+  z-index: 10002;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 8vmin;
+  height: 8vmin;
+}
+
+.nav-arrow:hover {
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-arrow.left {
+  left: 2vmin;
+}
+
+.nav-arrow.right {
+  right: 2vmin;
 }

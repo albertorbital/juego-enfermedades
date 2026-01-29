@@ -5,9 +5,11 @@ import { characters } from './characters.js'
 const resolvePath = (path) => {
   if (!path) return '';
   if (path.startsWith('http') || path.startsWith('data:')) return path;
+  const baseUrl = import.meta.env.BASE_URL;
+  if (path.startsWith(baseUrl)) return path; // Already resolved
   // Remove leading slash if present to avoid double slashes with BASE_URL
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-  return `${import.meta.env.BASE_URL}${cleanPath}`;
+  return `${baseUrl}${cleanPath}`;
 };
 
 // Game State
@@ -17,6 +19,85 @@ let gameMode = '1vs1'; // Default mode
 const flippedStates = new Set(); // Global state for all categories
 let cardSubIndices = {}; // Track sub-index for multi-item cards
 let lastCycledId = null; // Track last cycled card for animation
+let activeTriggerQuestion = null; // Track last clicked question for animations
+
+// Carousel State
+let carouselItems = [];
+let currentCarouselIndex = 0;
+
+// Progress Goal Anim
+let goalFrame = 0;
+const goalFramesCount = 19;
+let goalInterval = null;
+
+function updateGoalIcon() {
+  const goalImg = document.getElementById('goal-icon');
+  if (goalImg) {
+    goalImg.src = resolvePath(`images/switch/char${goalFrame}.png`);
+    goalFrame = (goalFrame + 1) % goalFramesCount;
+  }
+}
+
+function startGoalAnimation() {
+  if (goalInterval) clearInterval(goalInterval);
+  goalInterval = setInterval(updateGoalIcon, 1000 / 12);
+}
+
+function stopGoalAnimation() {
+  if (goalInterval) {
+    clearInterval(goalInterval);
+    goalInterval = null;
+  }
+}
+
+// Character Background Animations
+let cardAnimInterval = null;
+const animConfigs = {
+  virus: { count: 22, dir: 'images/character_virus' },
+  bacteria: { count: 21, dir: 'images/character_bacteria' },
+  fungus: { count: 20, dir: 'images/character_hongo' },
+  parasite: { count: 24, dir: 'images/character_parasite' }
+};
+
+function updateCardAnimations() {
+  const animations = document.querySelectorAll('.card-bg-anim:not(.fade-out)');
+  if (animations.length === 0) return;
+  // console.log(`Animating ${animations.length} cards`); // Silent for now but ready if needed
+
+  const now = Date.now();
+  animations.forEach(anim => {
+    const type = anim.dataset.type;
+    const config = animConfigs[type];
+    if (!config) return;
+
+    // Stagger using a unique seed (card ID)
+    const id = parseInt(anim.dataset.id);
+    const fps = 12;
+    // Calculate frame: (CurrentTime / FrameDuration + Offset) % FrameCount
+    // Increase stagger to make it more obvious
+    const frameIndex = Math.floor((now / (1000 / fps) + id * 5) % config.count);
+    const img = anim.querySelector('img');
+    if (img) {
+      const newSrc = resolvePath(`${config.dir}/char${frameIndex}.png`);
+      if (img.getAttribute('src') !== newSrc) {
+        img.src = newSrc;
+      }
+    }
+  });
+}
+
+function startCardAnimations() {
+  if (cardAnimInterval) clearInterval(cardAnimInterval);
+  cardAnimInterval = setInterval(updateCardAnimations, 1000 / 12);
+}
+
+function updateCarouselList() {
+  carouselItems = [
+    { src: 'images/enfermedades/0_titulo.png', title: '' },
+    { src: 'images/enfermedades/1_Protocolos_aislamiento.png', title: 'Protocolos de Aislamientos' },
+    ...characters.map(c => ({ src: c.infoImage, title: c.name }))
+  ];
+}
 
 const rounds = ['agente', 'transmision', 'prevencion_ciudadana', 'prevencion_hospitalaria', 'sistema_afectado'];
 
@@ -90,25 +171,65 @@ window.openImage = (src, title) => {
   const overlay = document.getElementById('image-overlay');
   const img = document.getElementById('overlay-active-image');
   const titleEl = document.getElementById('overlay-active-title');
+  const btnPrev = document.getElementById('btn-prev-image');
+  const btnNext = document.getElementById('btn-next-image');
 
   if (overlay && img && titleEl) {
-    img.src = src;
+    const targetSrc = resolvePath(src);
+    // Determine Index
+    currentCarouselIndex = carouselItems.findIndex(item => resolvePath(item.src) === targetSrc);
+
+    img.src = targetSrc;
     titleEl.textContent = title;
+
+    // Toggle Arrows
+    if (currentCarouselIndex === -1) {
+      if (btnPrev) btnPrev.style.display = 'none';
+      if (btnNext) btnNext.style.display = 'none';
+    } else {
+      if (btnPrev) btnPrev.style.display = 'flex';
+      if (btnNext) btnNext.style.display = 'flex';
+    }
+
     overlay.classList.remove('hidden');
-    overlay.style.display = '';
+    overlay.style.display = 'flex';
   }
-  event.stopPropagation();
 };
 
-window.showQuestion = (text) => {
+window.nextImage = (e) => {
+  if (currentCarouselIndex === -1 || carouselItems.length === 0) return;
+  currentCarouselIndex = (currentCarouselIndex + 1) % carouselItems.length;
+  const item = carouselItems[currentCarouselIndex];
+  window.openImage(item.src, item.title); // Recursively acts as update
+  if (e) e.stopPropagation();
+};
+
+window.prevImage = (e) => {
+  if (currentCarouselIndex === -1 || carouselItems.length === 0) return;
+  currentCarouselIndex = (currentCarouselIndex - 1 + carouselItems.length) % carouselItems.length;
+  const item = carouselItems[currentCarouselIndex];
+  window.openImage(item.src, item.title);
+  if (e) e.stopPropagation();
+};
+
+window.openCarousel = (index = 0) => {
+  if (carouselItems.length === 0) updateCarouselList(); // Ensure loaded
+  if (index < 0) index = 0;
+  if (index >= carouselItems.length) index = 0;
+
+  const item = carouselItems[index];
+  window.openImage(item.src, item.title);
+};
+
+window.showQuestion = (text, e) => {
   const overlay = document.getElementById('question-overlay');
   const textEl = document.getElementById('question-text');
   if (overlay && textEl) {
     textEl.textContent = text;
     overlay.classList.remove('hidden');
-    overlay.style.display = '';
+    overlay.style.display = 'flex';
   }
-  event.stopPropagation();
+  if (e && e.stopPropagation) e.stopPropagation();
 };
 
 // Helper: Generate Dynamic Segmented Icon
@@ -132,18 +253,24 @@ function getCardFrontContent(char, category, index) {
   const images = categoryData.images || (categoryData.image ? [categoryData.image] : ['/images/card_back.png']);
   const imageSrc = resolvePath(images[index] || images[0]);
   const infoSrc = resolvePath(char.infoImage || imageSrc);
-  const questionText = getQuestionText(char, category, index);
+  const categoryText = getCategoryText(char, category, index);
 
-  const total = images.length;
+  const rawText = getRawCategoryText(char, category);
+  const textCount = Array.isArray(rawText) ? rawText.length : 1;
+  const total = Math.max(images.length, textCount);
   const isStacked = total > 1;
-  const cycleBtn = isStacked
-    ? `<div class="cycle-btn" onclick="cycleCardItem('${char.id}'); event.stopPropagation()">+${total - 1} ↻</div>`
-    : '';
+  const stackIcon = total >= 3
+    ? '<span class="stack-visual stack-3"></span>'
+    : (total === 2 ? '<span class="stack-visual stack-2"></span>' : '');
 
+  const cycleBtn = isStacked
+    ? `<div class="cycle-btn" onclick="cycleCardItem('${char.id}'); event.stopPropagation()">${stackIcon}+${total - 1} ↻</div>`
+    : '';
   return `
     ${cycleBtn}
     <div class="character-name" onclick="openImage('${infoSrc}', '${char.name}'); event.stopPropagation()">${char.name}</div>
-    <img src="${imageSrc}" alt="${char.name}">
+    <div class="card-category-text">${categoryText}</div>
+    <img src="${imageSrc}" alt="${char.name}" onclick="openImage('${infoSrc}', '${char.name}'); event.stopPropagation()" style="cursor: pointer;">
   `;
 }
 
@@ -153,10 +280,22 @@ window.cycleCardItem = (id) => {
   const catData = char.categories[activeCategory];
   const images = catData.images || (catData.image ? [catData.image] : []);
 
-  if (images.length <= 1) return;
+  const rawText = getRawCategoryText(char, activeCategory);
+  const textCount = Array.isArray(rawText) ? rawText.length : 1;
+  const total = Math.max(images.length, textCount);
+
+  if (total <= 1) return;
 
   const currentIndex = cardSubIndices[char.id] || 0;
-  const nextIndex = (currentIndex + 1) % images.length;
+  const nextIndex = (currentIndex + 1) % total;
+
+  // Update trigger question when cycling if it was the active trigger
+  const oldQuestion = getQuestionText(char, activeCategory, currentIndex);
+  const newQuestion = getQuestionText(char, activeCategory, nextIndex);
+  if (activeTriggerQuestion === oldQuestion) {
+    activeTriggerQuestion = newQuestion;
+    updateBackgroundAnimationsTrigger();
+  }
 
   const cardEl = document.querySelector(`.card[data-id="${char.id}"]`);
   if (cardEl) {
@@ -186,6 +325,10 @@ window.cycleCardItem = (id) => {
     const nameEl = newFace.querySelector('.character-name');
     if (nameEl) fitText(nameEl);
 
+    // Fit category text too maybe?
+    const catTextEl = newFace.querySelector('.card-category-text');
+    if (catTextEl) fitText(catTextEl, 3.6, 1.0); // Custom helper usage if needed, or just leave css
+
     const onAnimationEnd = () => {
       cardSubIndices[char.id] = nextIndex;
 
@@ -212,6 +355,27 @@ function getFeedbackText(char, category) {
   return value;
 }
 
+function getRawCategoryText(char, category) {
+  if (!char) return null;
+  switch (category) {
+    case 'agente': return char.agentText;
+    case 'transmision': return char.transmissionText;
+    case 'prevencion_ciudadana': return char.prevencion_ciudadanaText;
+    case 'prevencion_hospitalaria': return char.prevencion_hospitalariaText;
+    case 'sistema_afectado': return char.sistema_afectadoText;
+  }
+  return null;
+}
+
+function getCategoryText(char, category, index = 0) {
+  const text = getRawCategoryText(char, category);
+
+  if (Array.isArray(text)) {
+    return text[index] || text[0] || '';
+  }
+  return text || '';
+}
+
 function getQuestionText(char, category, index = 0) {
   let value = char.categories[category].text;
   if (Array.isArray(value)) value = value[index] || value[0];
@@ -226,21 +390,43 @@ function getQuestionText(char, category, index = 0) {
   }
 }
 
-// Helper: Fit Text to Container
-function fitText(el) {
+// Helper: Check if a character has a specific question available in a category
+function hasQuestionInCategory(char, category, targetQuestion) {
+  const raw = getRawCategoryText(char, category);
+  if (!raw) return false;
+  const list = Array.isArray(raw) ? raw : [raw];
+  return list.includes(targetQuestion);
+}
+
+// Helper: Fit Text to Container with Vertical Center logic
+function fitText(el, initialSize = 3.6, minSize = 0.8) {
   if (!el) return;
-  // Reset to default first
-  el.style.fontSize = '';
-  el.style.whiteSpace = 'nowrap';
+  // Reset for calculation
+  el.style.fontSize = `${initialSize}vmin`;
+  el.style.whiteSpace = 'normal'; // Allow wrapping as requested
+  el.style.alignItems = 'center'; // Ensure vertically centered flex
+  el.style.display = 'flex';
 
-  let size = 2.5; // Default vmin
-  const minSize = 0.8; // Minimum readable size
+  let size = initialSize;
 
-  // Check if overflowing
-  while (el.scrollWidth > el.clientWidth && size > minSize) {
+  // Check if overflowing VERTICALLY primarily, or horizontally if single word
+  // We use scrollHeight > clientHeight as the main constraint for multi-line text
+  while (
+    (el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth) &&
+    size > minSize
+  ) {
     size -= 0.1;
     el.style.fontSize = `${size}vmin`;
   }
+}
+
+// Helper: Get Character Type
+function getCharacterType(char) {
+  if (char.agentText.includes('virus')) return 'virus';
+  if (char.agentText.includes('bacteria')) return 'bacteria';
+  if (char.agentText.includes('hongo')) return 'fungus';
+  if (char.agentText.includes('parásito')) return 'parasite';
+  return 'unknown';
 }
 
 function renderGrid() {
@@ -249,8 +435,12 @@ function renderGrid() {
     const subIndex = cardSubIndices[char.id] || 0;
     const categoryData = char.categories[activeCategory];
     const images = categoryData.images || [];
-    const isStacked = images.length > 1;
+
+    const rawText = getRawCategoryText(char, activeCategory);
+    const textCount = Array.isArray(rawText) ? rawText.length : 1;
+    const isStacked = Math.max(images.length, textCount) > 1;
     const stackedClass = isStacked ? 'stacked' : '';
+    const type = getCharacterType(char);
 
     // Back Face Content
     const feedbackText = getFeedbackText(char, activeCategory);
@@ -260,18 +450,24 @@ function renderGrid() {
     const infoSrc = resolvePath(char.infoImage || rawImg);
     const questionText = getQuestionText(char, activeCategory, subIndex);
 
+    const currentQuestion = getQuestionText(char, activeCategory, subIndex);
+    const isAnimated = activeTriggerQuestion && !flippedStates.has(char.id) && currentQuestion === activeTriggerQuestion;
+    const animTag = isAnimated && animConfigs[type]
+      ? `<div class="card-bg-anim" data-id="${char.id}" data-type="${type}"><img src="${resolvePath(animConfigs[type].dir + '/char0.png')}" alt="anim"></div>`
+      : '';
+
     // Front Content is generated by helper
     const frontContent = getCardFrontContent(char, activeCategory, subIndex);
 
     return `
-      <div class="card-container">
-        <div class="card ${stackedClass}" data-id="${char.id}">
+      <div class="card-container ${isAnimated ? 'is-candidate' : ''}">
+        ${animTag}
+        <div class="card ${stackedClass}" data-id="${char.id}" data-type="${type}">
           <div class="card-face card-front">
             ${frontContent}
           </div>
           <div class="card-face card-back">
-            <div class="character-name-back" onclick="openImage('${infoSrc}', '${char.name}'); event.stopPropagation()">${char.name}</div>
-            <div class="eliminated-mark">X</div>
+            <div class="character-name-back" onclick="openImage('${infoSrc}', '${char.name}'); event.stopPropagation()">No eres ${char.name}</div>
             <div class="feedback-text">${feedbackText}</div>
           </div>
         </div>
@@ -300,12 +496,64 @@ function renderGrid() {
   }
 
   // Adjust font sizes
-  document.querySelectorAll('.character-name, .character-name-back').forEach(fitText);
+  document.querySelectorAll('.character-name, .character-name-back').forEach(el => fitText(el, 2.5, 0.8));
+  document.querySelectorAll('.card-category-text').forEach(el => fitText(el, 3.6, 1.0));
+}
+
+// Game State Extras
+let winTimeout = null;
+let hasShownEndGameForCurrentState = false;
+
+function updateBackgroundAnimationsTrigger() {
+  const allContainers = document.querySelectorAll('.card-container');
+  allContainers.forEach(container => {
+    const card = container.querySelector('.card');
+    const id = parseInt(card.dataset.id);
+    const char = characters.find(c => c.id === id);
+    const type = getCharacterType(char);
+
+    // Check if THIS card has the activeTriggerQuestion anywhere in the current category
+    const isAnimated = activeTriggerQuestion && !flippedStates.has(id) && hasQuestionInCategory(char, activeCategory, activeTriggerQuestion);
+    const currentAnim = container.querySelector('.card-bg-anim');
+
+    if (isAnimated) {
+      // console.log(`Card ${id} matches trigger: ${activeTriggerQuestion}`);
+      if (!currentAnim || currentAnim.classList.contains('fade-out')) {
+        if (currentAnim) currentAnim.remove();
+        const animTag = `<div class="card-bg-anim" data-id="${id}" data-type="${type}"><img src="${resolvePath(animConfigs[type].dir + '/char0.png')}" alt="anim"></div>`;
+        container.insertAdjacentHTML('afterbegin', animTag);
+        container.classList.add('is-candidate');
+      }
+    } else {
+      if (currentAnim && !currentAnim.classList.contains('fade-out')) {
+        currentAnim.classList.add('fade-out');
+        container.classList.remove('is-candidate');
+        setTimeout(() => {
+          if (currentAnim.parentNode === container) currentAnim.remove();
+        }, 500);
+      }
+    }
+  });
 }
 
 function handleCardClick(e) {
   const card = e.currentTarget;
   const id = parseInt(card.dataset.id);
+  const char = characters.find(c => c.id === id);
+  const subIndex = cardSubIndices[id] || 0;
+
+  // Interaction logic for indicators
+  if (!card.classList.contains('is-flipped')) {
+    // Clicking a face-up card: Activate its group indicators
+    const rawQuestions = getRawCategoryText(char, activeCategory);
+    const triggerQuestion = Array.isArray(rawQuestions) ? rawQuestions[subIndex] : rawQuestions;
+    if (triggerQuestion && triggerQuestion !== activeTriggerQuestion) {
+      activeTriggerQuestion = triggerQuestion;
+    }
+  } else {
+    // Clicking a face-down card: Clear all active indicators
+    activeTriggerQuestion = null;
+  }
 
   if (card.classList.contains('is-flipped')) {
     card.classList.remove('is-flipped');
@@ -313,94 +561,336 @@ function handleCardClick(e) {
   } else {
     card.classList.add('is-flipped');
     flippedStates.add(id);
+
+    // Fade out background animation specifically for this card
+    const container = card.parentElement;
+    const anim = container.querySelector('.card-bg-anim');
+    if (anim) {
+      anim.classList.add('fade-out');
+      setTimeout(() => anim.remove(), 550);
+    }
+  }
+
+  // Surgical update for all animations
+  updateBackgroundAnimationsTrigger();
+
+  // Progress Logic
+  updateProgress();
+  checkWinCondition();
+}
+
+function updateProgress() {
+  const total = characters.length;
+  const flipped = flippedStates.size;
+  const up = total - flipped;
+  const percentage = (flipped / total) * 100;
+
+  const bar = document.querySelector('.progress-fill');
+  if (bar) {
+    bar.style.width = `${percentage}%`;
+    bar.className = 'progress-fill'; // Reset classes
+
+    if (up <= 3 && up > 1) bar.classList.add('blink-slow');
+    if (up <= 2 && up > 1) bar.classList.add('blink-fast'); // If 2, effectively blink fast override
   }
 }
 
+function checkWinCondition() {
+  const total = characters.length;
+  const flipped = flippedStates.size;
+  const up = total - flipped;
+
+  // If we went back up to > 1 card, reset the latch
+  if (up > 1) {
+    hasShownEndGameForCurrentState = false;
+    if (winTimeout) clearTimeout(winTimeout);
+  }
+
+  // If exactly 1 card left and we haven't shown it yet
+  if (up === 1 && !hasShownEndGameForCurrentState) {
+    if (winTimeout) clearTimeout(winTimeout);
+    winTimeout = setTimeout(() => {
+      // Double check state hasn't changed
+      const currentUp = characters.length - flippedStates.size;
+      if (currentUp === 1) {
+        hasShownEndGameForCurrentState = true;
+        document.getElementById('endgame-overlay').classList.remove('hidden');
+        document.getElementById('endgame-overlay').style.display = 'flex';
+      }
+    }, 2000);
+  }
+}
+
+// Simple Confetti Implementation
+function startConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = [];
+  const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
+
+  for (let i = 0; i < 200; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: Math.random() * 10 + 5,
+      speed: Math.random() * 5 + 2,
+      angle: Math.random() * 6.28
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.y += p.speed;
+      p.x += Math.sin(p.angle);
+      p.angle += 0.1;
+      if (p.y > canvas.height) p.y = -20;
+
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// SVG Icons
+const icons = {
+  menu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>',
+  agente: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><path d="M6 6l12 12M6 18L18 6"/></svg>', // Virus-like
+  transmision: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 2.1l4 4-4 4"/><path d="M3 12.2v-2a4 4 0 0 1 4-4h12.8M7 21.9l-4-4 4-4"/><path d="M21 11.8v2a4 4 0 0 1-4 4H4.2"/></svg>', // Exchange arrows
+  prevencion_ciudadana: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', // Shield
+  prevencion_hospitalaria: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="6" stroke-dasharray="2 4"/></svg>', // Cross/Hospital
+  sistema_afectado: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' // Heart/Organ
+};
+
 function renderGameUI() {
-  const config = roundConfig[activeCategory];
-
-  document.querySelector('#app').innerHTML = `
-    <div class="container">
+  const app = document.querySelector('#app');
+  app.innerHTML = `
+    <div class="container fade-in">
+      <!-- Nav Layout -->
       <div class="nav-bar">
-        <div class="nav-group left">
-          <div class="tab nav-btn" id="btn-group">Grupo</div>
-          <div class="tab nav-btn" id="btn-oponente" style="${gameMode === '1vs1' ? '' : 'display:none'}">Oponente</div>
+        <!-- Landscape Nav: Text Buttons -->
+        <div class="nav-landscape">
+          <div class="nav-group left">
+            <button class="nav-btn nav-btn-light" id="btn-group">Grupo</button>
+            <button class="nav-btn nav-btn-light" id="btn-instructions">Instrucciones</button>
+          </div>
+          <div class="nav-group right">
+             <button class="nav-btn nav-btn-light" id="btn-enfermedades">Enfermedades</button>
+             ${gameMode === '1vs1' ? '<button class="nav-btn nav-btn-red" id="btn-oponente">Enfermedad Oponente</button>' : ''}
+          </div>
         </div>
 
-        <div class="tabs-container">
-          ${rounds.map(r => {
-    const isActive = r === activeCategory ? 'active' : '';
-    return `<div class="tab ${isActive}" data-category="${r}">${roundConfig[r].label}</div>`;
-  }).join('')}
+        <!-- Portrait Nav: Hamburger + Text Tabs -->
+        <div class="nav-portrait">
+          <button class="icon-btn-menu" id="btn-hamburger">${icons.menu}</button>
+          <div class="portrait-categories">
+            ${rounds.map(r => `
+              <button class="cat-text-btn ${activeCategory === r ? 'active' : ''}" data-category="${r}">
+                ${roundConfig[r].label}
+              </button>
+            `).join('')}
+          </div>
         </div>
+      </div>
 
-        <div class="nav-group right">
-          <div class="tab nav-btn" id="btn-instructions">Instrucciones</div>
+      <!-- Landscape Category Tabs (Original) -->
+      <div class="tabs-container landscape-only">
+        ${rounds.map(r => `
+          <div class="tab ${activeCategory === r ? 'active' : ''}" data-category="${r}">
+            ${roundConfig[r].label}
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Mobile/Portrait Menu Overlay (triggered by Hamburger) -->
+      <div id="mobile-menu-overlay" class="hidden">
+        <div class="mobile-menu-panel">
+          <button class="nav-btn nav-btn-light full-width" id="mob-btn-group">Grupo</button>
+          <button class="nav-btn nav-btn-light full-width" id="mob-btn-instructions">Instrucciones</button>
+          <button class="nav-btn nav-btn-red full-width" id="mob-btn-oponente">Enfermedad Oponente</button>
+          <button class="nav-btn nav-btn-close full-width" id="mob-btn-close">Cerrar</button>
         </div>
       </div>
       
-      <h1 class="title">${config.question}</h1>
+      <!-- Ending Overlay -->
+      <div id="endgame-overlay" class="hidden">
+         <h1 class="overlay-title">¿Has adivinado qué enfermedad eres?</h1>
+         <div class="overlay-actions">
+           <button class="action-btn yes-btn" id="btn-end-yes">¡SÍ!</button>
+           <button class="action-btn no-btn" id="btn-end-no">NO</button>
+         </div>
+      </div>
+      
+      <!-- Celebrations Overlay -->
+      <div id="celebration-overlay" class="hidden">
+         <h1 class="overlay-title">¡ENHORABUENA!</h1>
+         <canvas id="confetti-canvas"></canvas>
+         <button class="action-btn restart-btn" id="btn-restart">Empezar de nuevo</button>
+      </div>
+
+      <!-- Progress Bar Container -->
+      <div class="progress-container">
+        <div class="progress-wrapper">
+          <div class="progress-bar">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+        <div class="progress-goal">
+          <img id="goal-icon" src="${resolvePath('images/switch/char0.png')}" alt="goal">
+        </div>
+      </div>
       
       <div class="card-grid" id="grid"></div>
     </div>
   `;
 
   renderGrid();
+  updateProgress();
 
-  document.querySelectorAll('.tab:not(.nav-btn)').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      const newCategory = e.target.dataset.category;
-      if (newCategory !== activeCategory) {
-        activeCategory = newCategory;
-        cardSubIndices = {};
-        renderGameUI();
-      }
-    });
+  // --- Event Listeners ---
+
+  const handleCategory = (cat) => {
+    if (cat !== activeCategory) {
+      activeCategory = cat;
+      cardSubIndices = {};
+      activeTriggerQuestion = null; // Reset animations on category change
+      renderGameUI();
+    }
+  };
+
+  // Landscape Tabs
+  document.querySelectorAll('.tab').forEach(el =>
+    el.addEventListener('click', (e) => handleCategory(e.target.dataset.category)));
+
+  // Portrait Text Tabs
+  document.querySelectorAll('.cat-text-btn').forEach(el =>
+    el.addEventListener('click', (e) => handleCategory(e.currentTarget.dataset.category)));
+
+  // Mobile Menu Logic
+  const mobMenu = document.getElementById('mobile-menu-overlay');
+
+  // Open Menu
+  document.getElementById('btn-hamburger')?.addEventListener('click', () => {
+    mobMenu.classList.remove('hidden');
   });
 
-  const groupBtn = document.getElementById('btn-group');
-  if (groupBtn) {
-    groupBtn.addEventListener('click', () => {
-      const overlay = document.getElementById('group-overlay');
-      overlay.classList.remove('hidden');
-      overlay.style.display = '';
-    });
-  }
+  // Close Menu
+  document.getElementById('mob-btn-close')?.addEventListener('click', () => {
+    mobMenu.classList.add('hidden');
+  });
 
-  const instructionsBtn = document.getElementById('btn-instructions');
-  if (instructionsBtn) {
-    instructionsBtn.addEventListener('click', () => {
-      const overlay = document.getElementById('instructions-overlay');
-      overlay.classList.remove('hidden');
-      overlay.style.display = '';
-    });
-  }
+  // Mobile Menu Actions
+  const openOverlay = (id) => {
+    document.getElementById(id).classList.remove('hidden');
+    document.getElementById(id).style.display = '';
+    mobMenu.classList.add('hidden'); // Close menu after selection
+  };
 
-  const oponenteBtn = document.getElementById('btn-oponente');
-  if (oponenteBtn) {
-    oponenteBtn.addEventListener('click', () => {
-      const overlay = document.getElementById('start-overlay');
-      // Ensure we re-set the target name just in case
-      const targetNameDisplay = document.getElementById('target-name-display');
-      const targetImageDisplay = document.getElementById('target-image-display');
+  // Re-attach listeners for both Desktop and Mobile buttons (using helper to avoid duplication?)
+  // Desktop
+  document.getElementById('btn-group')?.addEventListener('click', () => openOverlay('group-overlay'));
+  document.getElementById('btn-instructions')?.addEventListener('click', () => openOverlay('instructions-overlay'));
 
-      if (targetNameDisplay && targetChar) {
-        targetNameDisplay.textContent = targetChar.name;
-        if (targetImageDisplay) targetImageDisplay.src = resolvePath(targetChar.infoImage) || '';
-      }
-      overlay.classList.remove('hidden');
-      overlay.style.display = '';
-    });
+  // Mobile
+  document.getElementById('mob-btn-group')?.addEventListener('click', () => openOverlay('group-overlay'));
+  document.getElementById('mob-btn-instructions')?.addEventListener('click', () => openOverlay('instructions-overlay'));
+
+  // Opponent Logic (Shared)
+  const showOpponent = () => {
+    const overlay = document.getElementById('start-overlay');
+    const targetNameDisplay = document.getElementById('target-name-display');
+    const targetImageDisplay = document.getElementById('target-image-display');
+
+    if (targetNameDisplay && targetChar) {
+      targetNameDisplay.textContent = targetChar.name;
+      if (targetImageDisplay) targetImageDisplay.src = resolvePath(targetChar.infoImage) || '';
+    }
+    overlay.classList.remove('hidden');
+    overlay.style.display = '';
+    mobMenu.classList.add('hidden');
+  };
+
+  document.getElementById('btn-oponente')?.addEventListener('click', showOpponent);
+  document.getElementById('mob-btn-oponente')?.addEventListener('click', showOpponent);
+
+  // Carousel Button
+  document.getElementById('btn-enfermedades')?.addEventListener('click', () => {
+    window.openCarousel(0); // Start from Intro 0
+  });
+
+  // End Game Buttons
+  document.getElementById('btn-end-yes')?.addEventListener('click', () => {
+    document.getElementById('endgame-overlay').classList.add('hidden');
+    document.getElementById('celebration-overlay').classList.remove('hidden');
+    document.getElementById('celebration-overlay').style.display = 'flex';
+    startConfetti();
+  });
+
+  document.getElementById('btn-end-no')?.addEventListener('click', () => {
+    document.getElementById('endgame-overlay').classList.add('hidden');
+    document.getElementById('endgame-overlay').style.display = 'none';
+    // Resume play
+  });
+
+  document.getElementById('btn-restart')?.addEventListener('click', () => {
+    window.location.reload();
+  });
+}
+
+// Initialize Game
+// Home Screen Animation Control
+let homeAnimInterval = null;
+
+function startHomeAnimation() {
+  const img = document.getElementById('home-anim-img');
+  if (!img) return;
+
+  // Preload frames logic could go here but let's trust browser cache for simple loop
+  let frame = 1;
+  const totalFrames = 21; // Updated to 21 chars
+  const fps = 12;
+
+  const updateFrame = () => {
+    // Filename format: char1.png to char21.png
+    const path = `images/group/char${frame}.png`;
+    img.src = resolvePath(path);
+    frame = (frame % totalFrames) + 1;
+  };
+
+  updateFrame(); // First immediately
+  homeAnimInterval = setInterval(updateFrame, 1000 / fps);
+}
+
+function stopHomeAnimation() {
+  if (homeAnimInterval) {
+    clearInterval(homeAnimInterval);
+    homeAnimInterval = null;
   }
 }
 
 // Initialize Game
-// Initialize Game
 async function initGame() {
-  // Initialize game state immediately
+  console.log('Game Initializing...');
+  startHomeAnimation();
+
   characters.sort(() => Math.random() - 0.5);
   targetChar = characters[Math.floor(Math.random() * characters.length)];
   activeCategory = 'agente';
+
+  try {
+    updateCarouselList(); // Init Carousel Images
+    startGoalAnimation();
+    startCardAnimations();
+  } catch (e) {
+    console.error('Animation initialization failed:', e);
+  }
 
   // Setup DOM elements
   const modeOverlay = document.getElementById('mode-selection-overlay');
@@ -411,20 +901,22 @@ async function initGame() {
 
   // Start Logic
   const startTheGame = () => {
-    if (modeOverlay) {
-      modeOverlay.classList.add('hidden');
-      modeOverlay.style.display = 'none';
-    }
-    // Render the initial game state
-    // Render the initial game state
-    renderGameUI();
+    try {
+      stopHomeAnimation();
+      if (modeOverlay) {
+        modeOverlay.classList.add('hidden');
+        modeOverlay.style.display = 'none';
+      }
+      renderGameUI();
 
-    // Game Start Flow: Instructions First
-    window.isGameSetup = true;
-    const instructionsOverlay = document.getElementById('instructions-overlay');
-    if (instructionsOverlay) {
-      instructionsOverlay.classList.remove('hidden');
-      instructionsOverlay.style.display = '';
+      window.isGameSetup = true;
+      const instructionsOverlay = document.getElementById('instructions-overlay');
+      if (instructionsOverlay) {
+        instructionsOverlay.classList.remove('hidden');
+        instructionsOverlay.style.display = 'flex';
+      }
+    } catch (e) {
+      console.error('Failed to start game:', e);
     }
   };
 
