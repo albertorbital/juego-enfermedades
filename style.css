@@ -274,15 +274,15 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   /* Centered exactly */
-  width: 90%;
-  height: 90%;
+  width: 120%;
+  height: 120%;
   object-fit: contain;
   opacity: 0.4;
   z-index: 1;
   /* Below text */
   pointer-events: none;
   filter: grayscale(0.2);
-  margin-top: 5%;
+  margin-top: 0;
   /* Slight offset down to clear title potentially */
 }
 
@@ -1044,6 +1044,8 @@ body {
 #btn-instructions.icon-btn {
   background-color: #444;
 }
+
+
 
 /* Center Nav Container */
 .center-nav {

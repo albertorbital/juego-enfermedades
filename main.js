@@ -972,6 +972,9 @@ async function initGame() {
         instructionsOverlay.classList.remove('hidden');
         instructionsOverlay.style.display = 'flex';
       }
+
+
+
     } catch (e) {
       console.error('Failed to start game:', e);
     }

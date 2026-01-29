@@ -7,7 +7,7 @@ export const characters = [
         agentText: "¿Eres un virus?",
         transmissionText: ["¿Te transmites por sangre/fluidos sexuales?", "¿Te transmites por sangre/fluidos?", "¿Te transmites por madre-hijo?"],
         prevencion_ciudadanaText: "¿Te previenes con sexo seguro?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento por gota?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas al sistema digestivo?",
         infoImage: "/images/enfermedades/VIH.png",
         categories: {
@@ -24,7 +24,7 @@ export const characters = [
         agentText: "¿Eres un virus?",
         transmissionText: ["¿Te transmites por sangre/fluidos sexuales?", "¿Te transmites por sangre/fluidos?", "¿Te transmites por madre-hijo?"],
         prevencion_ciudadanaText: ["¿Te previenes con vacunación?", "¿Te previenes con sexo seguro?"],
-        prevencion_hospitalariaText: "¿Precisas aislamiento por gota?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas al sistema digestivo?",
         infoImage: "/images/enfermedades/hepatitis_b.png",
         categories: {
@@ -41,7 +41,7 @@ export const characters = [
         agentText: "¿Eres un virus?",
         transmissionText: ["¿Te transmites por aire/gotas?", "¿Te transmites por contacto?", "¿Te transmites por sangre/fluidos?"],
         prevencion_ciudadanaText: ["¿Te previenes con higiene?", "¿Te previenes con vacunación?", "¿Te previenes con protección personal?"],
-        prevencion_hospitalariaText: "¿Precisas aislamiento por gota?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... por gotas?",
         sistema_afectadoText: "¿Afectas al sistema respiratorio?",
         infoImage: "/images/enfermedades/Covid-19.png",
         categories: {
@@ -59,7 +59,7 @@ export const characters = [
         transmissionText: ["¿Te transmites por aire/gotas?", "¿Te transmites por contacto?"],
         infoImage: "/images/enfermedades/Varicela.png",
         prevencion_ciudadanaText: ["¿Te previenes con higiene?", "¿Te previenes con vacunación?"],
-        prevencion_hospitalariaText: "¿Precisas aislamiento por aire?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... por aire?",
         sistema_afectadoText: "¿Afectas al sistema cutáneo?",
         categories: {
             agente: { text: ["Virus Varicela-Zoster (VZV)"], image: "/images/agente/virus.png", images: ["/images/agente/virus.png"] },
@@ -76,7 +76,7 @@ export const characters = [
         infoImage: "/images/enfermedades/mononucleosis.png",
         transmissionText: ["¿Te transmites por aire/gotas?", "¿Te transmites por contacto?"],
         prevencion_ciudadanaText: "¿Te previenes con higiene?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas de forma sistémica?",
         categories: {
             agente: { text: ["Virus Epstein-Barr (EBV)"], image: "/images/agente/virus.png", images: ["/images/agente/virus.png"] },
@@ -94,7 +94,7 @@ export const characters = [
         agentText: "¿Eres una bacteria?",
         transmissionText: "¿Te transmites por aire/gotas?",
         prevencion_ciudadanaText: ["¿Te previenes con protección personal?", "¿Te previenes con higiene?"],
-        prevencion_hospitalariaText: "¿Precisas aislamiento por aire?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... por aire?",
         sistema_afectadoText: "¿Afectas al sistema respiratorio?",
         infoImage: "/images/enfermedades/Tuberculosis.png",
         categories: {
@@ -111,7 +111,7 @@ export const characters = [
         agentText: "¿Eres una bacteria?",
         transmissionText: ["¿Te transmites por aire/gotas?", "¿Te transmites por contacto?"],
         prevencion_ciudadanaText: ["¿Te previenes con protección personal?", "¿Te previenes con higiene?", "¿Te previenes con vacunación?"],
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... por gotas?",
         sistema_afectadoText: "¿Afectas al sistema respiratorio?",
         infoImage: "/images/enfermedades/neumonia_bacteriana.png",
         categories: {
@@ -128,7 +128,7 @@ export const characters = [
         agentText: "¿Eres una bacteria?",
         transmissionText: "¿Te transmites por sangre/fluidos sexuales?",
         prevencion_ciudadanaText: "¿Te previenes con sexo seguro?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas al sistema genitourinario?",
         infoImage: "/images/enfermedades/Gonorrea.png",
         categories: {
@@ -145,7 +145,7 @@ export const characters = [
         agentText: "¿Eres una bacteria?",
         transmissionText: "¿Te transmites por sangre/fluidos sexuales?",
         prevencion_ciudadanaText: "¿Te previenes con sexo seguro?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas al sistema genitourinario?",
         infoImage: "/images/enfermedades/Clamidia.png",
         categories: {
@@ -163,12 +163,12 @@ export const characters = [
         transmissionText: "¿Te transmites por agua/alimentos?",
         infoImage: "/images/enfermedades/Salmonelosis.png",
         prevencion_ciudadanaText: "¿Te previenes con seguridad alimentaria?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas al sistema digestivo?",
         categories: {
             agente: { text: ["Salmonella spp."], image: "/images/agente/bacteria.png", images: ["/images/agente/bacteria.png"] },
             transmision: { text: ["🍗 Alimentos o agua contaminado(huevos crudo, lácteos no pasteurizados, frutas y verduras mal lavadas)", "✋ Contacto fecal-oral"], image: "/images/transmision/alimentos.png", images: ["/images/transmision/alimentos.png"] },
-            prevencion_ciudadana: { text: ["🧼 Higiene: Lavado de manos, cocción adecuada, higiene alimentaria"], image: "/images/prevencion/higiene.png", images: ["/images/prevencion/higiene.png", "/images/prevencion/alimentos.png"] },
+            prevencion_ciudadana: { text: ["🧼 Higiene: Lavado de manos, cocción adecuada, higiene alimentaria"], image: "/images/prevencion/higiene.png", images: ["/images/prevencion/alimentos.png"] },
             prevencion_hospitalaria: { text: ["Precauciones estándar"], image: "/images/epi/noprecisa.png", images: ["/images/epi/noprecisa.png"] },
             sistema_afectado: { text: ["🤢 Digestivo: diarrea, fiebre, dolor abdominal; característico: inicio brusco tras ingestión de alimentos contaminados"], image: "/images/organo/digestivo.png", images: ["/images/organo/digestivo.png"] }
         }
@@ -181,11 +181,11 @@ export const characters = [
         infoImage: "/images/enfermedades/Botulismo.png",
         transmissionText: "¿Te transmites por agua/alimentos?",
         prevencion_ciudadanaText: "¿Te previenes con seguridad alimentaria?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: ["¿Afectas al sistema neurológico?", "¿Afectas al sistema digestivo?"],
         categories: {
             agente: { text: ["Clostridium botulinum"], image: "/images/agente/bacteria.png", images: ["/images/agente/bacteria.png"] },
-            transmision: { text: ["🍗 Alimentos contaminados (mal conservados, caseros, fermentados incorrectamente)"], image: "/images/transmision/alimentos.png", images: ["/images/transmision/fluidos.png", "/images/transmision/alimentos.png"] },
+            transmision: { text: ["🍗 Alimentos contaminados (mal conservados, caseros, fermentados incorrectamente)"], image: "/images/transmision/alimentos.png", images: ["/images/transmision/alimentos.png"] },
             prevencion_ciudadana: { text: ["🍳 Evitar alimentos mal conservados"], image: "/images/prevencion/alimentos.png", images: ["/images/prevencion/alimentos.png"] },
             prevencion_hospitalaria: { text: ["Precauciones estándar"], image: "/images/epi/noprecisa.png", images: ["/images/epi/noprecisa.png"] },
             sistema_afectado: { text: ["🧠 Neurológico: visión doble, dificultad respiratoria; característico: parálisis flácida"], image: "/images/organo/digestivo.png", images: ["/images/organo/digestivo.png", "/images/organo/neurologico.png"] }
@@ -200,7 +200,7 @@ export const characters = [
         transmissionText: "¿Te transmites por vectores?",
         infoImage: "/images/enfermedades/Malaria.png",
         prevencion_ciudadanaText: "¿Te previenes evitando el contacto?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas de forma sistémica?",
         categories: {
             agente: { text: ["Plasmodium spp."], image: "/images/agente/parasito.png", images: ["/images/agente/parasito.png"] },
@@ -217,7 +217,7 @@ export const characters = [
         infoImage: "/images/enfermedades/toxoplasmosis.png",
         transmissionText: "¿Te transmites por agua/alimentos?",
         prevencion_ciudadanaText: "¿Te previenes con seguridad alimentaria?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: ["¿Afectas al sistema neurológico?", "¿Afectas al sistema digestivo?"],
         categories: {
             agente: { text: ["Toxoplasma gondii"], image: "/images/agente/parasito.png", images: ["/images/agente/parasito.png"] },
@@ -234,7 +234,7 @@ export const characters = [
         infoImage: "/images/enfermedades/leishmaniosis.png",
         transmissionText: "¿Te transmites por vectores?",
         prevencion_ciudadanaText: "¿Te previenes evitando el contacto?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas de forma sistémica?",
         categories: {
             agente: { text: ["Leishmania spp."], image: "/images/agente/parasito.png", images: ["/images/agente/parasito.png"] },
@@ -251,7 +251,7 @@ export const characters = [
         infoImage: "/images/enfermedades/Anisakis.png",
         transmissionText: "¿Te transmites por agua/alimentos?",
         prevencion_ciudadanaText: "¿Te previenes con seguridad alimentaria?",
-        prevencion_hospitalariaText: "¿Precisas de aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas al sistema digestivo?",
         categories: {
             agente: { text: ["Anisakis spp."], image: "/images/agente/parasito.png", images: ["/images/agente/parasito.png"] },
@@ -268,7 +268,7 @@ export const characters = [
         infoImage: "/images/enfermedades/Sarna.png",
         transmissionText: "¿Te transmites por contacto?",
         prevencion_ciudadanaText: ["¿Te previenes con higiene?", "¿Te previenes evitando el contacto?"],
-        prevencion_hospitalariaText: "¿Precisas de aislamiento de contacto?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... de contacto?",
         sistema_afectadoText: "¿Afectas al sistema cutáneo?",
         categories: {
             agente: { text: ["Sarcoptes scabiei"], image: "/images/agente/parasito.png", images: ["/images/agente/parasito.png"] },
@@ -285,7 +285,7 @@ export const characters = [
         infoImage: "/images/enfermedades/Pediculosis.png",
         transmissionText: "¿Te transmites por contacto?",
         prevencion_ciudadanaText: ["¿Te previenes con higiene?", "¿Te previenes evitando el contacto?"],
-        prevencion_hospitalariaText: "¿Precisas de aislamiento de contacto?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... de contacto?",
         sistema_afectadoText: "¿Afectas al sistema cutáneo?",
         categories: {
             agente: { text: ["Pediculus humanus"], image: "/images/agente/parasito.png", images: ["/images/agente/parasito.png"] },
@@ -304,7 +304,7 @@ export const characters = [
         infoImage: "/images/enfermedades/Candidiasis.png",
         transmissionText: "¿Te transmites por contacto?",
         prevencion_ciudadanaText: "¿Te previenes con higiene?",
-        prevencion_hospitalariaText: "¿Precisas de aislamiento de contacto?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: ["¿Afectas al sistema cutáneo?", "¿Afectas al sistema genitourinario?"],
         categories: {
             agente: { text: ["Candida albicans"], image: "/images/agente/hongo.png", images: ["/images/agente/hongo.png"] },
@@ -321,7 +321,7 @@ export const characters = [
         infoImage: "/images/enfermedades/tina.png",
         transmissionText: "¿Te transmites por contacto?",
         prevencion_ciudadanaText: "¿Te previenes con higiene?",
-        prevencion_hospitalariaText: "¿Precisas de aislamiento de contacto?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas al sistema cutáneo?",
         categories: {
             agente: { text: ["Dermatofitos (Trichophyton spp.)"], image: "/images/agente/hongo.png", images: ["/images/agente/hongo.png"] },
@@ -337,13 +337,13 @@ export const characters = [
         agentText: "¿Eres un hongo?",
         transmissionText: "¿Te transmites por contacto?",
         prevencion_ciudadanaText: "¿Te previenes con higiene?",
-        prevencion_hospitalariaText: "¿Precisas aislamiento?",
+        prevencion_hospitalariaText: "¿Precisas Aislamiento... estándar?",
         sistema_afectadoText: "¿Afectas al sistema cutáneo?",
         infoImage: "/images/enfermedades/onicomicosis.png",
         categories: {
             agente: { text: ["Dermatofitos / levaduras"], image: "/images/agente/hongo.png", images: ["/images/agente/hongo.png"] },
             transmision: { text: ["✋ Contacto directo"], image: "/images/transmision/contacto.png", images: ["/images/transmision/contacto.png"] },
-            prevencion_ciudadana: { text: ["🧼 Higiene uñas: no compartir utensilios manicura/pedicura"], image: "/images/prevencion/higiene.png", images: ["/images/prevencion/higiene.png", "/images/prevencion/contacto.png"] },
+            prevencion_ciudadana: { text: ["🧼 Higiene uñas: no compartir utensilios manicura/pedicura"], image: "/images/prevencion/higiene.png", images: ["/images/prevencion/higiene.png"] },
             prevencion_hospitalaria: { text: ["Precauciones estándar"], image: "/images/epi/noprecisa.png", images: ["/images/epi/noprecisa.png"] },
             sistema_afectado: { text: ["🧴 cutaneo (uñas): engrosamiento, decoloración, fragilidad; característico: uñas amarillentas y engrosadas"], image: "/images/organo/cutaneo.png", images: ["/images/organo/cutaneo.png"] }
         }
